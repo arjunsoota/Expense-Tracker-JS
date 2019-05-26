@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Personal Expense</title>
+    <link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+			crossorigin="anonymous"
+		/>
+</head>
+<script
+			defer
+			src="https://use.fontawesome.com/releases/v5.7.2/js/all.js"
+			integrity="sha384-0pzryjIRos8mFBWMzSSZApWtPl/5++eIfzYmTgBBmXYdhvxPc+XcFEk+zJwDgWbP"
+			crossorigin="anonymous"
+		></script>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <span class="navbar-brand mb-0 h1">Xpense Tracker</span>
+        <span class="navbar-brand mb-0 h1" id="heading1"></span>
+    </nav>
+    <div class="container-fluid bg-light" style="min-height: 100vh"> 
+        <div class="container">
+            <div class="jumbotron mt-4">
+					<div class="input-group mb-3">
+						<input
+							type="text"
+                            class="form-control"
+                            id="inputAmount"
+							placeholder="Amount spent"
+							aria-label="Amount spent"
+							aria-describedby="spent in rupee"
+						/>
+						<div class="input-group-append">
+							<span class="input-group-text" id="spent in rupee">₹</span>
+						</div>
+					</div>
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text" id="spent at">@</span>
+						</div>
+						<input
+							type="text"
+							class="form-control"
+                            placeholder="spent On"
+                            id="textDesc"
+							aria-label="spent On"
+							aria-describedby="spent at"
+						/>
+						<div class="input-group-append">
+							<button class="btn btn-outline-primary" type="button" id='btnCounter'>Add</button>
+						</div>
+					</div>
+                </div>
+                <div>
+                    <ul class="list-group" id="expenseTable">
+                </div>
+    </div>
+   
+    
+    <script>
+
+        //get the heading element
+        const heading = document.querySelector("#heading1");
+         //read the value from input 
+         const inputElement = document.querySelector("#inputAmount");
+         const textDescEl = document.querySelector("#textDesc");
+         // get the reference to table 
+         const expenseTableEl = document.querySelector("#expenseTable");
+        
+        
+        //set iniitial value of expense to zero
+        let totalExpense = 0 ;
+        //set the heading element to totalExpense
+        heading.textContent = totalExpense;
+
+        //  allexpenses at one place
+        let allExpenses = [] 
+        //onButtonClick add input amount to TotalExpense
+        function addExpenseTotal(){
+            
+            const expenseItem = {};
+            const textAmount = inputElement.value;
+            const textDesc = textDescEl.value;
+            //change the text value to number
+            const expense = parseInt(textAmount,10);
+
+            //put it in object
+            expenseItem.Desc = textDesc;
+            expenseItem.amount=expense;
+            expenseItem.moment =new Date();
+            
+            allExpenses.push(expenseItem);
+            
+            //add it to total expense 
+            totalExpense = totalExpense + expense;
+            //set the heading element to totalExpense
+            const someText =`Total :${totalExpense} `;
+            heading.textContent = someText;
+
+            renderList(allExpenses)
+
+        }
+
+
+        //get the button element
+        const element =  document.querySelector("#btnCounter");
+  
+        //listen to click event
+        element.addEventListener("click",addExpenseTotal,false);
+       
+        //controller functions
+
+        //get date string 
+        function getDateString(moment0){
+            return moment0.toLocaleDateString('en-US',{
+                year:'numeric',
+                month:'long',
+                day:'numeric',
+            });
+        }
+
+        //delete item 
+
+        function deleteItem(dateValue){
+            let newArr = [];
+            let exp=0;
+            for(let i =0;i<allExpenses.length;i++){
+                if(allExpenses[i].moment.valueOf() !== dateValue){
+                    newArr.push(allExpenses[i]);
+                }
+                else
+                    exp = allExpenses[i].amount;
+            }
+           
+            if(totalExpense>0)
+            totalExpense = totalExpense - exp;
+            const someText =`Total :${totalExpense} `;
+            heading.textContent = someText;
+            allExpenses = Array.from(newArr);
+            renderList(newArr);
+        }
+            // view layer 
+
+            function renderList(arrayList){
+                const allExpenseHTML = arrayList.map(expense => createListItem(expense));
+                const joinAllExpenseHTML = allExpenseHTML.join("");
+                expenseTableEl.innerHTML = joinAllExpenseHTML ;
+            }
+
+            function createListItem({ Desc,amount,moment}){
+                return `<li class="list-group-item d-flex justify-content-between">
+							<div class="d-flex flex-column">
+                                    ${Desc} 
+								<small class="text-muted">${getDateString(moment)}</small>
+							</div>
+							<div>
+								<span class="px-5">
+                                        ${amount}
+								</span>
+                                <button 
+                                    type="button" 
+                                    class="btn btn-outline-danger btn-sm"
+                                    onclick="deleteItem(${moment.valueOf()})"
+                                >
+									<i class="fas fa-trash-alt"></i>
+								</button>
+							</div>
+                        </li>
+                    ` 
+            }
+    </script>   
+</body>
+</html>
