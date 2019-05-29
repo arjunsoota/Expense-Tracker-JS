@@ -1,1 +1,1 @@
-"# Expense Tracker app in JavaScript" 
+#Expense Tracker app in JavaScript
